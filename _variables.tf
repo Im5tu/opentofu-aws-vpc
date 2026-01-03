@@ -19,6 +19,7 @@ variable "public_subnets" {
     cidr                    = string
     availability_zone       = string
     enable_nat_gateway      = bool
+    enable_alb              = bool
     vpc_interface_endpoints = list(string)
     vpc_gateway_endpoints   = list(string)
     tags                    = map(string)

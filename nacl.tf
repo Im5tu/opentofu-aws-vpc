@@ -7,6 +7,22 @@ resource "aws_network_acl" "this" {
   }
 }
 
+# Associate NACL with public subnets
+resource "aws_network_acl_association" "public" {
+  for_each = var.enable_vpc_nacl ? aws_subnet.public : {}
+
+  network_acl_id = aws_network_acl.this[0].id
+  subnet_id      = each.value.id
+}
+
+# Associate NACL with private subnets
+resource "aws_network_acl_association" "private" {
+  for_each = var.enable_vpc_nacl ? aws_subnet.private : {}
+
+  network_acl_id = aws_network_acl.this[0].id
+  subnet_id      = each.value.id
+}
+
 resource "aws_network_acl_rule" "internal_inbound" {
   count          = var.enable_vpc_nacl ? 1 : 0
   network_acl_id = aws_network_acl.this[0].id
@@ -16,6 +32,7 @@ resource "aws_network_acl_rule" "internal_inbound" {
   rule_action    = "allow"
   cidr_block     = aws_vpc.this.cidr_block
 }
+
 resource "aws_network_acl_rule" "internal_outbound" {
   count          = var.enable_vpc_nacl ? 1 : 0
   network_acl_id = aws_network_acl.this[0].id
@@ -25,26 +42,3 @@ resource "aws_network_acl_rule" "internal_outbound" {
   rule_action    = "allow"
   cidr_block     = aws_vpc.this.cidr_block
 }
-
-# resource "aws_network_acl_rule" "additional_ports_inbound" {
-#   for_each       = var.enable_vpc_nacl ? var.nacl_additional_external_ports : []
-#   network_acl_id = aws_network_acl.this[0].id
-#   rule_number    = 300 + each.key
-#   egress         = false
-#   protocol       = "-1"
-#   rule_action    = "allow"
-#   cidr_block     = var.nacl_additional_ports_cidr
-#   from_port      = each.value
-#   to_port        = each.value
-# }
-# resource "aws_network_acl_rule" "additional_ports_outbound" {
-#   for_each       = var.enable_vpc_nacl ? var.nacl_additional_external_ports : []
-#   network_acl_id = aws_network_acl.this[0].id
-#   rule_number    = 400 + each.key
-#   egress         = true
-#   protocol       = "-1"
-#   rule_action    = "allow"
-#   cidr_block     = var.nacl_additional_ports_cidr
-#   from_port      = each.value
-#   to_port        = each.value
-# }

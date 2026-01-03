@@ -53,6 +53,12 @@ variable "enable_alb" {
   default     = false
 }
 
+variable "enable_waf" {
+  description = "Determines whether or not to enable WAF for the ALB"
+  type        = bool
+  default     = false
+}
+
 variable "enable_dns_firewall" {
   description = "Determines whether or not the DNS firewall is created"
   type        = bool
@@ -76,6 +82,7 @@ variable "nacl_additional_external_ports" {
   type        = list(number)
   default     = []
 }
+
 variable "nacl_additional_ports_cidr" {
   description = "CIDR block for additional ports in the NACL rules. Default: 10.0.0.0/8"
   type        = string

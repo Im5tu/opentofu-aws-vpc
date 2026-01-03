@@ -76,8 +76,10 @@ resource "aws_route" "private_nat" {
   route_table_id         = each.value.id
   destination_cidr_block = "0.0.0.0/0"
   # For single NAT strategy: all private subnets use the first (only) NAT gateway
-  # For per_az strategy: each private subnet uses the NAT gateway in its AZ
-  nat_gateway_id = var.nat_gateway_strategy == "single" ? values(aws_nat_gateway.public)[0].id : aws_nat_gateway.public[each.key].id
+  # For per_az strategy: use NAT gateway in same AZ if available, otherwise fallback to first available
+  nat_gateway_id = var.nat_gateway_strategy == "single" ? values(aws_nat_gateway.public)[0].id : (
+    contains(keys(aws_nat_gateway.public), each.key) ? aws_nat_gateway.public[each.key].id : values(aws_nat_gateway.public)[0].id
+  )
 }
 
 # Private Route Table Association

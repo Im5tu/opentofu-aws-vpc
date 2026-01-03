@@ -1,2 +1,5 @@
+# WAF with Log4j protection (AWSManagedRulesKnownBadInputsRuleSet) is attached
+# via aws_wafv2_web_acl_association when enable_waf=true.
+# Checkov cannot trace conditional resource relationships.
 skip-check:
-  - CKV2_AWS_76 # WAF with Log4j protection (AWSManagedRulesKnownBadInputsRuleSet) is attached via aws_wafv2_web_acl_association when enable_waf=true. Checkov cannot trace conditional resource relationships.
+  - CKV2_AWS_76

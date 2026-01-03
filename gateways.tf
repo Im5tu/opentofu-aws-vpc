@@ -186,3 +186,53 @@ resource "aws_wafv2_web_acl_association" "alb" {
 
   depends_on = [aws_lb.alb, aws_wafv2_web_acl.alb]
 }
+
+# WAF Logging - CloudWatch Log Group (must start with "aws-waf-logs-")
+resource "aws_cloudwatch_log_group" "waf" {
+  count = var.enable_alb && var.enable_waf ? 1 : 0
+
+  name              = "aws-waf-logs-${var.name}"
+  retention_in_days = 365
+
+  tags = {
+    Name = "aws-waf-logs-${var.name}"
+  }
+}
+
+# Resource policy to allow WAF to write to CloudWatch Logs
+resource "aws_cloudwatch_log_resource_policy" "waf" {
+  count = var.enable_alb && var.enable_waf ? 1 : 0
+
+  policy_name = "${var.name}-waf-logging"
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.waf[0].arn}:*"
+        Condition = {
+          ArnLike = {
+            "aws:SourceArn" = aws_wafv2_web_acl.alb[0].arn
+          }
+        }
+      }
+    ]
+  })
+}
+
+# WAF Logging Configuration
+resource "aws_wafv2_web_acl_logging_configuration" "alb" {
+  count = var.enable_alb && var.enable_waf ? 1 : 0
+
+  log_destination_configs = [aws_cloudwatch_log_group.waf[0].arn]
+  resource_arn            = aws_wafv2_web_acl.alb[0].arn
+
+  depends_on = [aws_cloudwatch_log_resource_policy.waf]
+}

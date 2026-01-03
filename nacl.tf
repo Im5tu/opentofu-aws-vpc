@@ -2,25 +2,15 @@ resource "aws_network_acl" "this" {
   count  = var.enable_vpc_nacl ? 1 : 0
   vpc_id = aws_vpc.this.id
 
+  # Attach to all public and private subnets
+  subnet_ids = concat(
+    [for s in aws_subnet.public : s.id],
+    [for s in aws_subnet.private : s.id]
+  )
+
   tags = {
     Name = "${var.name}-nacl"
   }
-}
-
-# Associate NACL with public subnets
-resource "aws_network_acl_association" "public" {
-  for_each = var.enable_vpc_nacl ? aws_subnet.public : {}
-
-  network_acl_id = aws_network_acl.this[0].id
-  subnet_id      = each.value.id
-}
-
-# Associate NACL with private subnets
-resource "aws_network_acl_association" "private" {
-  for_each = var.enable_vpc_nacl ? aws_subnet.private : {}
-
-  network_acl_id = aws_network_acl.this[0].id
-  subnet_id      = each.value.id
 }
 
 resource "aws_network_acl_rule" "internal_inbound" {

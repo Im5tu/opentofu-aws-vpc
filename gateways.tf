@@ -95,6 +95,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_all" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
+# checkov:skip=CKV2_AWS_76:WAF with Log4j protection (AWSManagedRulesKnownBadInputsRuleSet) is attached via aws_wafv2_web_acl_association when enable_waf=true
 resource "aws_lb" "alb" {
   count              = var.enable_alb ? 1 : 0
   name               = "${var.name}-alb"

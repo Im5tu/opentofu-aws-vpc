@@ -6,7 +6,7 @@ An OpenTofu module for creating AWS VPCs with public/private subnets, NAT gatewa
 
 ```hcl
 module "vpc" {
-  source = "git::https://github.com/im5tu/opentofu-aws-vpc.git?ref=main"
+  source = "git::https://github.com/im5tu/opentofu-aws-vpc.git?ref=b5bf74e81361e18bf3dc4950ffe3f4fbd4c1e463"
 
   name = "my-vpc"
   cidr = "10.0.0.0/16"

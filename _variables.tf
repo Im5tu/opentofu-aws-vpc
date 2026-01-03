@@ -71,6 +71,12 @@ variable "dns_firewall_allowed_domains" {
   default     = []
 }
 
+variable "enable_flow_logs" {
+  description = "Enable or disable VPC flow logs. Disabled by default to reduce costs."
+  type        = bool
+  default     = false
+}
+
 variable "enable_vpc_nacl" {
   description = "Enable or disable the creation of VPC NACL. This needs work to ensure secure comms with VPC Peers"
   type        = bool

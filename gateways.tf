@@ -55,7 +55,7 @@ resource "aws_lb" "alb" {
   count              = var.enable_alb ? 1 : 0
   name               = "${var.name}-alb"
   internal           = false
-  load_balancer_type = "network"
+  load_balancer_type = "application"
   subnets = [
     for subnet in var.public_subnets :
     aws_subnet.public[subnet.availability_zone].id

@@ -7,6 +7,15 @@ resource "aws_route53_resolver_firewall_rule_group" "this" {
   }
 }
 
+resource "aws_route53_resolver_firewall_rule_group_association" "this" {
+  count = var.enable_dns_firewall ? 1 : 0
+
+  name                   = "${var.name}-dns-firewall"
+  firewall_rule_group_id = aws_route53_resolver_firewall_rule_group.this[0].id
+  vpc_id                 = aws_vpc.this.id
+  priority               = 100
+}
+
 resource "aws_route53_resolver_firewall_domain_list" "verified_domains" {
   count = var.enable_dns_firewall ? 1 : 0
 
